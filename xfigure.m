@@ -16,7 +16,7 @@ function [h, this] = xfigure(varargin)
 % Version 1.3, created by Mirza Cenanovic
 
 %% Initiate
-global xfigure_This
+% global xfigure_This
 
 xfigure_This.blankWindow = 0;
 figureIDIsProvided = 0;
@@ -167,7 +167,7 @@ this = xfigure_This;
     
 %% CallBackFunctions
     function KeyPressFcn(source,event)
-        xfigure_KPF(source, event);
+        xfigure_KPF(source, event, xfigure_This);
         
     end
 

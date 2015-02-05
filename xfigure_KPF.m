@@ -1,8 +1,8 @@
-function xfigure_KPF(source,event)
+function xfigure_KPF(source,event,xfigure_This)
 % xfigure_KPF KeyPressCallback_3D
 % Used by xfigure
 
-global xfigure_This
+% global xfigure_This
 %% modifier
 modifier = get(source,'currentModifier');
 if isempty(modifier)
