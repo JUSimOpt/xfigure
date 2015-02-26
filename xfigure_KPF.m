@@ -68,6 +68,7 @@ end
 
 %% h - help
 if strcmp(event.Key,'h')
+    xfigure_This
     if strcmpi(get(xfigure_This.uiTextHelp,'Visible'),'off')
         set(xfigure_This.uiTextHelp,'Visible','on')
     else

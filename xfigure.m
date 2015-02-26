@@ -141,6 +141,10 @@ xfigure_This.hrot = 0;
 xfigure_This.grid = 0;
 xfigure_This.CameraViewAngleDefault = get(xfigure_This.axes,'CameraViewAngle');
 xfigure_This.CameraViewAngle = xfigure_This.CameraViewAngleDefault;
+xfigure_This.ZoomLevel = xfigure_This.CameraViewAngleDefault;
+xfigure_This.CameraDefaultPosition = get(xfigure_This.axes,'CameraPosition');
+xfigure_This.CameraTarget = get(xfigure_This.axes,'CameraTarget');
+
 
 %% Original figure state
 xfigure_This.axO = xfigure_This.axis;
@@ -176,33 +180,26 @@ this = xfigure_This;
 %% CallBackFunctions
 
     function buttonDownFcn(varargin)
-        modifier = get(xfigure_This.gui,'currentModifier');
+        modifier = get(gcf,'currentModifier');
         if isempty(modifier)
             modifier = 0;
         end
-        selection = get(xfigure_This.gui,'SelectionType');
+        selection = get(gcf,'SelectionType');
         
         %% Middlemouse
         if strcmpi(selection,'extend')
             
             xfigure_This.panSensitivity = 1;
             
-            set(xfigure_This.gui,'Pointer','fleur')
-            set(xfigure_This.gui,'WindowButtonMotionFcn', @PanWindowButtonFcn)
-            
-            
-            
-            crd = get(xfigure_This.gui, 'CurrentPoint');
+            set(gcf,'Pointer','fleur')
+            set(gcf,'WindowButtonMotionFcn', @PanWindowButtonFcn)
+           
+            crd = get(gcf, 'CurrentPoint');
             x = crd(1);
             y = crd(2);
             
             xfigure_This.xstartPos = x;
             xfigure_This.ystartPos = y;
-            
-%             
-%             % Disable rotation
-%             try set(xfigure_This.hrot,'Enable','off'); end
-%             xfigure_This.rotate3d = 0;
         end
         
         %% CTRL + Middlemouse = rotate
@@ -237,9 +234,10 @@ this = xfigure_This;
     end
     
     function PanWindowButtonFcn(varargin)
+
         
-        try
-        crd = get(xfigure_This.gui, 'CurrentPoint');
+        %% Old
+        crd = get(gcf, 'CurrentPoint');
         x = crd(1);
         y = crd(2);
         dx = -(xfigure_This.xstartPos - x);
@@ -253,12 +251,20 @@ this = xfigure_This;
         Pos = Pos + xfigure_This.panSensitivity * [dx,dy,0,0];
         
         set(gca,'Position', Pos)
-        end
+        %% New
+%         crd = get(xfigure_This.gui, 'CurrentPoint');
+%         x = crd(1); y = crd(2);
+%         dx = -(xfigure_This.xstartPos - x)
+%         dy = -(xfigure_This.ystartPos - y)
+%         xfigure_This.xstartPos = x;
+%         xfigure_This.ystartPos = y;
+%         camdolly(-dx/100,-dy/100,0,'movetarget','camera')
+%         
+%         xfigure_This.CameraPosition
         
     end
 
-    function RotateWindowButtonFcn(varargin)
-        
+    function RotateWindowButtonFcn(varargin)        
         crd = get(xfigure_This.gui, 'CurrentPoint');
         x = crd(1);
         y = crd(2);
@@ -296,12 +302,11 @@ this = xfigure_This;
         catch
 %             disp(['Az: ',num2str(xfigure_This.az), ' El: ', num2str(xfigure_This.el) ])
         end
+
     end
 
     function ScrollFcn(varargin)
-        %% Zoom factor:
-        zf = .5;
-        
+        %% Zoom factor:        
         controlIsPressed = 0;
         modifier = get(xfigure_This.gui,'currentModifier');
         if ~isempty(modifier)
@@ -312,35 +317,12 @@ this = xfigure_This;
         end
         
         if varargin{2}.VerticalScrollCount < 0 && controlIsPressed
-            % zoom in
-            if xfigure_This.CameraViewAngle > 1
-                xfigure_This.CameraViewAngle = xfigure_This.CameraViewAngle - zf;
-            elseif xfigure_This.CameraViewAngle < 1
-                xfigure_This.CameraViewAngle = xfigure_This.CameraViewAngle - zf/10;
-            end
-            
-            if xfigure_This.CameraViewAngle < 0
-                xfigure_This.CameraViewAngle = 0.001;
-            end
-            try
-                set(xfigure_This.axes,'CameraViewAngle',xfigure_This.CameraViewAngle)
-            catch
-                zoom(1.1)
-            end
+            %Zoom in
+            camzoom(1.1)
             
         elseif varargin{2}.VerticalScrollCount > 0 && controlIsPressed
             % zoom out
-            if xfigure_This.CameraViewAngle < 1
-                xfigure_This.CameraViewAngle = xfigure_This.CameraViewAngle + zf/10;
-            elseif xfigure_This.CameraViewAngle >= 1
-                xfigure_This.CameraViewAngle = xfigure_This.CameraViewAngle + zf;
-            end
-            try
-                set(xfigure_This.axes,'CameraViewAngle',xfigure_This.CameraViewAngle)
-            catch
-                zoom(0.8)
-            end
-            
+            camzoom(0.8)
         end
     end
 
