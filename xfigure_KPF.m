@@ -60,7 +60,7 @@ if strcmp(modifier,'shift') && strcmp(event.Key,'p')
     WindowPosition = get(xfigure_This.gui,'Position');
     save(xfigure_This.filename, 'WindowPosition')
     try
-        set(xfigure_This.uistatusText, 'String', ['Figure position saved to: ', xfigure_This.filename])
+        set(xfigure_This.StatusBox, 'String', ['Figure position saved to: ', xfigure_This.filename])
     catch
         disp(['Figure position saved to: ', xfigure_This.filename])
     end
@@ -68,7 +68,6 @@ end
 
 %% h - help
 if strcmp(event.Key,'h')
-    xfigure_This
     if strcmpi(get(xfigure_This.uiTextHelp,'Visible'),'off')
         set(xfigure_This.uiTextHelp,'Visible','on')
     else
@@ -111,7 +110,7 @@ if strcmp(modifier,'shift') && strcmp(event.Key,'s')
     xfigure_This.el = vRounded(2);
     view([xfigure_This.az, xfigure_This.el]);
     try
-        set(xfigure_This.uistatusText, 'String', ['Az: ',num2str(xfigure_This.az), ' El: ', num2str(xfigure_This.el) ])
+        set(xfigure_This.StatusBox, 'String', ['Az: ',num2str(xfigure_This.az), ' El: ', num2str(xfigure_This.el) ])
     end
 end
 

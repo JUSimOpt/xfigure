@@ -100,18 +100,20 @@ xfigure_This.helpText = {'Press "G" to toggle grid'...
     'Press "SHIFT+S" snap the view to the view-box'...
     'Press "SHIFT+P" to save the current window position'};
 xfigure_This.uiTextHelp = uicontrol('style','text','string',xfigure_This.helpText,'HorizontalAlignment','Left',...
-    'Position', [5,5,500,64],'Visible','off');
+    'Position', [5,5,500,64],'Visible','off','BackgroundColor','w');
 ext1 = get(xfigure_This.uiTextHelp,'Extent');
 set(xfigure_This.uiTextHelp,'Position',[5,20,ext1(3),ext1(4)])
 
 %% Status text
 xfigure_This.statusText = ' ';
-xfigure_This.uistatusText = uicontrol('style','text','string',xfigure_This.statusText,'HorizontalAlignment','Left',...
-    'Position', [7,5,20,20],'Visible','on');
-set(xfigure_This.uistatusText,'BackgroundColor',xfigure_This.bcolor)
+% xfigure_This.uistatusText = uicontrol('style','text','string',xfigure_This.statusText,'HorizontalAlignment','Left',...
+%     'Position', [7,5,20,20],'Visible','on');
+xfigure_This.StatusBox = annotation('textbox', 'string', xfigure_This.statusText,'HorizontalAlignment','Left',...
+    'Units','pixels','Position', [7,5,20,20],'LineStyle','none','Visible','on');
+% set(xfigure_This.uistatusText,'BackgroundColor','w')
 xfigure_This.statusTextWidth = xfigure_This.WindowPosition(3)-2*5;
 xfigure_This.statusTextHeight = 15;
-set(xfigure_This.uistatusText,'Position',[5, 5, xfigure_This.statusTextWidth, xfigure_This.statusTextHeight])
+set(xfigure_This.StatusBox,'Position',[5, 5, xfigure_This.statusTextWidth, xfigure_This.statusTextHeight])
 
 
 %% Axis properties
@@ -161,7 +163,7 @@ catch
 end
 
 %% Listeners
-set(xfigure_This.gui, 'KeyPressFcn',@KeyPressFcn)
+set(xfigure_This.gui, 'KeyPressFcn',{@xfigure_KPF,xfigure_This})
 set(xfigure_This.gui, 'WindowScrollWheelFcn',@ScrollFcn)
 set(xfigure_This.gui, 'WindowButtonDownFcn',@buttonDownFcn)
 set(xfigure_This.gui, 'WindowButtonUpFcn',@buttonUpFcn)
@@ -170,10 +172,7 @@ set(xfigure_This.gui, 'ResizeFcn', @ResizeFcn)
 this = xfigure_This;
     
 %% CallBackFunctions
-    function KeyPressFcn(source,event)
-        xfigure_KPF(source, event, xfigure_This);
-        
-    end
+    
 
 
 
@@ -217,7 +216,7 @@ this = xfigure_This;
             xfigure_This.ys = y;
             [xfigure_This.az,xfigure_This.el] = view;
             try
-                set(xfigure_This.uistatusText, 'String', ['Az: ',num2str(xfigure_This.az), ' El: ', num2str(xfigure_This.el) ])
+                set(xfigure_This.StatusBox, 'String', ['Az: ',num2str(xfigure_This.az), ' El: ', num2str(xfigure_This.el) ])
             catch
 %                 disp(['Az: ',num2str(xfigure_This.az), ' El: ', num2str(xfigure_This.el) ])
             end
@@ -228,7 +227,7 @@ this = xfigure_This;
         set(xfigure_This.gui,'WindowButtonMotionFcn','');
         set(xfigure_This.gui,'Pointer','arrow')
         try
-            set(xfigure_This.uistatusText, 'String', [' '])
+            set(xfigure_This.StatusBox, 'String', [' '])
         end
         
     end
@@ -298,7 +297,7 @@ this = xfigure_This;
             xfigure_This.el = xfigure_This.el + 360;
         end
         try
-            set(xfigure_This.uistatusText, 'String', ['Az: ',num2str(xfigure_This.az), ' El: ', num2str(xfigure_This.el) ])
+            set(xfigure_This.StatusBox, 'String', ['Az: ',num2str(xfigure_This.az), ' El: ', num2str(xfigure_This.el) ])
         catch
 %             disp(['Az: ',num2str(xfigure_This.az), ' El: ', num2str(xfigure_This.el) ])
         end
@@ -330,7 +329,7 @@ this = xfigure_This;
         xfigure_This.WindowPosition = get(xfigure_This.gui,'Position');
         xfigure_This.statusTextWidth = xfigure_This.WindowPosition(3)-2*5;
         try
-            set(xfigure_This.uistatusText,'Position',[5, 5, xfigure_This.statusTextWidth, xfigure_This.statusTextHeight])
+            set(xfigure_This.StatusBox,'Position',[5, 5, xfigure_This.statusTextWidth, xfigure_This.statusTextHeight])
         end
         xfigure_This.axesWidth = xfigure_This.WindowPosition(3)-xfigure_This.axesMarginSides*2;
         xfigure_This.axesHeight = xfigure_This.WindowPosition(4) - xfigure_This.axesMarginBottom - xfigure_This.axesMarginTop;
@@ -342,6 +341,10 @@ this = xfigure_This;
 
 end
 
+% function KeyPressFcn(source,event,xfigure_This)
+% xfigure_KPF(source, event, xfigure_This);
+% 
+% end
 
 function rv = isenabled(mode, varargin)
 if nargin < 1
