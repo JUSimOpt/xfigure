@@ -109,8 +109,43 @@ if strcmp(modifier,'shift') && strcmp(event.Key,'s')
     xfigure_This.az = vRounded(1);
     xfigure_This.el = vRounded(2);
     view([xfigure_This.az, xfigure_This.el]);
-    try
-        set(xfigure_This.StatusBox, 'String', ['Az: ',num2str(xfigure_This.az), ' El: ', num2str(xfigure_This.el) ])
-    end
+    set(xfigure_This.StatusBox, 'String', ['Az: ',num2str(xfigure_This.az), ' El: ', num2str(xfigure_This.el) ])
+
+end
+
+%%
+if strcmpi(event.Key,'numpad4')
+    [az,el] = view();
+    az = az+5;
+    view(az,el)
+    set(xfigure_This.StatusBox, 'String', ['Az: ',num2str(az), ' El: ', num2str(el) ])
+end
+if strcmpi(event.Key,'numpad6')
+    [az,el] = view();
+    az = az-5;
+    view(az,el)
+    set(xfigure_This.StatusBox, 'String', ['Az: ',num2str(az), ' El: ', num2str(el) ])
+end
+if strcmpi(event.Key,'numpad8')
+    [az,el] = view();
+    el = el-5;
+    view(az,el)
+    set(xfigure_This.StatusBox, 'String', ['Az: ',num2str(az), ' El: ', num2str(el) ])
+end
+if strcmpi(event.Key,'numpad2')
+    [az,el] = view();
+    el = el+5;
+    view(az,el)
+    set(xfigure_This.StatusBox, 'String', ['Az: ',num2str(az), ' El: ', num2str(el) ])
+end
+if strcmpi(event.Key,'numpad5')
+    [az,el] = view();
+    v = [az,el];
+    roundTargets = [-360 -270 -180 -90 0 90 180 270 360];
+    vRounded = interp1(roundTargets,roundTargets,v,'nearest');
+    az = vRounded(1);
+    el = vRounded(2);
+    view([az, el]);
+    set(xfigure_This.StatusBox, 'String', ['Az: ',num2str(az), ' El: ', num2str(el) ])
 end
 
