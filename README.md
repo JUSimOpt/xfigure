@@ -22,6 +22,10 @@ Extended figure with additional interactive mouse controls.
 - Shift+S to snap the view.
 - Shift+P to save the current position and size of the figure window. Next time it loads, the figure with the same number will automatically assume the saved figure position.
 
+## Installation
+Put *xfigure.m* and *xfigure_KPF.m* somewhere on your matlab path.
+Use GKPF as a template in each project where you want to override keypresses. 
+
 ## GKPF
 **Usage** (Matlab 2014b)
 
