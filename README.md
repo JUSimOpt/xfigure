@@ -1,6 +1,9 @@
 # xfigure - v1.4
 Extended figure with additional interactive mouse controls.
 
+[![xfigure demo](https://github.com/cenmir/xfigure/raw/master/XfigureDemo.gif)](https://www.youtube.com/watch?v=fAuVkC5DVEo)
+
+
 ### News:
 - 1.4 Added GKPF. Graphical Key Press Function. Ammends the default keypress with user defined keys. Use GKPF to add own hotkeys. Keep GKPF.m inside your project files.
 
