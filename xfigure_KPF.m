@@ -58,12 +58,16 @@ end
 %% SHIFT + P
 if strcmp(modifier,'shift') && strcmp(event.Key,'p')
     WindowPosition = get(xfigure_This.gui,'Position');
-    save(xfigure_This.filename, 'WindowPosition')
+    
+    [az,el] = view();
+    View = [az,el];
     try
+        save(xfigure_This.filename, 'WindowPosition', 'View')
         set(xfigure_This.StatusBox, 'String', ['Figure position saved to: ', xfigure_This.filename])
-    catch
-        disp(['Figure position saved to: ', xfigure_This.filename])
+    catch ex
+        error(['Error saving figure position.\n',ex.message])
     end
+
 end
 
 %% h - help

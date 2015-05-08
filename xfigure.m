@@ -13,7 +13,7 @@ function [h, this] = xfigure(varargin)
 % Press "SHIFT+S" snap the view to the view-box
 % Press "SHIFT+P" to save the current window position
 %
-% Version 1.3, created by Mirza Cenanovic
+% Version 1.4, created by Mirza Cenanovic
 
 %% Initiate
 % global xfigure_This
@@ -80,8 +80,12 @@ end
 xfigure_This.filename = ['XFig',get(xfigure_This.gui,'Tag'),'Data.mat'];
 if exist(xfigure_This.filename,'file') == 2
     S = load(xfigure_This.filename);
-    WP = S.WindowPosition;
-    set(xfigure_This.gui, 'Position', WP)
+    if isfield(S,'WindowPosition')
+        set(xfigure_This.gui, 'Position', S.WindowPosition)
+    end
+    if isfield(S,'View')
+       xfigure_This.view = S.View;
+    end
 end
 xfigure_This.WindowPosition = get(xfigure_This.gui, 'Position');
 
@@ -90,6 +94,8 @@ xfigure_This.WindowPosition = get(xfigure_This.gui, 'Position');
 xfigure_This.axes = axes;
 xfigure_This.axis = axis;
 
+%% View
+view(xfigure_This.view(1),xfigure_This.view(2))
 
 
 %% Help text
