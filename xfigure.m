@@ -39,12 +39,16 @@ if nargin >= 1
         end
     end
     
-    xfigure_This.gui = figure(fighand);
-    h = xfigure_This.gui;
-    
     if nargin > 1
         varargin = varargin(2:end);
     end
+    
+    if isenabled('clf',varargin)
+       tryclose(fighand) 
+    end
+    
+    xfigure_This.gui = figure(fighand);
+    h = xfigure_This.gui;
 else
     xfigure_This.gui = figure;
     xfigure_This.blankWindow = 1;
@@ -95,7 +99,9 @@ xfigure_This.axes = axes;
 xfigure_This.axis = axis;
 
 %% View
-view(xfigure_This.view(1),xfigure_This.view(2))
+if isfield(xfigure_This,'view')
+    view(xfigure_This.view(1),xfigure_This.view(2))
+end
 
 
 %% Help text

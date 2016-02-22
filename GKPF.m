@@ -3,6 +3,9 @@ function GKPF(src,evnt,xfigure_This,h)
 %   h is a struct that contains user defined graphical handles to be used
 %   in this function.
 %   xfigure_This is a handle to xfigure, returned by xfigure.
+%   Usage:
+%   [h, xf] = xfigure()
+%   h.KeyPressFcn = {@GKPF,xf,h};
 
     %% Do not touch
     %Leave this be, we need the standard keypress function!
