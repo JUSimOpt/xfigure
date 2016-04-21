@@ -113,7 +113,7 @@ if strcmp(modifier,'shift') && strcmp(event.Key,'s')
     xfigure_This.az = vRounded(1);
     xfigure_This.el = vRounded(2);
     view([xfigure_This.az, xfigure_This.el]);
-    set(xfigure_This.StatusBox, 'String', ['Az: ',num2str(xfigure_This.az), ' El: ', num2str(xfigure_This.el) ])
+%     set(xfigure_This.StatusBox, 'String', ['Az: ',num2str(xfigure_This.az), ' El: ', num2str(xfigure_This.el) ])
 
 end
 
