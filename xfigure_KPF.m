@@ -10,7 +10,7 @@ if isempty(modifier)
 end
 
 %% CTRL + R reset axis
-if strcmp(modifier,'control') && strcmp(event.Key,'r')
+if ~isempty(find(strcmp(modifier,'control'),1)) && strcmp(event.Key,'r')
     try
         ch = get(xfigure_This.axes, 'Children');
         if numel(ch) > 0
@@ -56,7 +56,7 @@ if strcmp(modifier,'control') && strcmp(event.Key,'r')
 end
 
 %% SHIFT + P
-if strcmp(modifier,'shift') && strcmp(event.Key,'p')
+if ~isempty(find(strcmp(modifier,'shift'),1))  && strcmp(event.Key,'p')
     WindowPosition = get(xfigure_This.gui,'Position');
     
     [az,el] = view();
@@ -105,7 +105,7 @@ if strcmp(event.Key,'g')
 end
 
 %% SHIFT + s - normal to
-if strcmp(modifier,'shift') && strcmp(event.Key,'s')
+if ~isempty(find(strcmp(modifier,'shift'),1)) && strcmp(event.Key,'s')
     [xfigure_This.az,xfigure_This.el] = view;
     v = [xfigure_This.az,xfigure_This.el];
     roundTargets = [-360 -270 -180 -90 0 90 180 270 360];
