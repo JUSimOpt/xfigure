@@ -58,11 +58,13 @@ end
 %% SHIFT + P
 if ~isempty(find(strcmp(modifier,'shift'),1))  && strcmp(event.Key,'p')
     WindowPosition = get(xfigure_This.gui,'Position');
+    AxisPosition = get(gca,'Position');
+    CameraZoom = get(gca,'CameraViewAngle');
     
     [az,el] = view();
     View = [az,el];
     try
-        save(xfigure_This.filename, 'WindowPosition', 'View')
+        save(xfigure_This.filename, 'WindowPosition', 'View', 'AxisPosition', 'CameraZoom')
         set(xfigure_This.StatusBox, 'String', ['Figure position saved to: ', xfigure_This.filename])
     catch ex
         error(['Error saving figure position.\n',ex.message])
