@@ -80,7 +80,15 @@ end
 
 
 
-%% Figure position
+
+
+
+
+%% Axes
+xfigure_This.axes = axes;
+xfigure_This.axis = axis;
+
+%% Figure position, view, axis position and camerazoom
 xfigure_This.filename = ['XFig',get(xfigure_This.gui,'Tag'),'Data.mat'];
 if exist(xfigure_This.filename,'file') == 2
     S = load(xfigure_This.filename);
@@ -89,14 +97,16 @@ if exist(xfigure_This.filename,'file') == 2
     end
     if isfield(S,'View')
        xfigure_This.view = S.View;
+       view(xfigure_This.view(1),xfigure_This.view(2))
     end
+    if isfield(S,'CameraZoom')
+        set(gca,'CameraViewAngle',S.CameraZoom)
+    end
+    
+    
+    
 end
 xfigure_This.WindowPosition = get(xfigure_This.gui, 'Position');
-
-
-%% Axes
-xfigure_This.axes = axes;
-xfigure_This.axis = axis;
 
 %% View
 if isfield(xfigure_This,'view')
@@ -142,6 +152,12 @@ xfigure_This.axesHeight = xfigure_This.WindowPosition(4) - xfigure_This.axesMarg
 
 set(xfigure_This.axes,'Position', [xfigure_This.axesMarginSides, xfigure_This.axesMarginBottom, xfigure_This.axesWidth,xfigure_This.axesHeight])
 
+if exist(xfigure_This.filename,'file') == 2
+    S = load(xfigure_This.filename);
+    if isfield(S,'AxisPosition')
+        set(gca,'Position',S.AxisPosition)
+    end
+end
 
 % xlabel('X')
 % ylabel('Y')
