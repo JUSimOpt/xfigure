@@ -1,10 +1,12 @@
-function [h, this] = xfigure(varargin)
+function [h, H] = xfigure(varargin)
 % xfigure
-% xfigure(fignumber)
-% xfigure(id) where id is a string e.g. xfigure('Mesh')
-% h = xfigure(...)
-% [h, xfigure_This] = xfigure(...)
+% [h, H] = xfigure()
+% [h, H] = xfigure(fignumber, param)
 %
+% Optional Parameter:
+% Tag
+% Title
+% InfoText    - TextBox with specified text.
 %
 % Press "G" to toggle grid
 % Press "CTRL+R" to reset axis
@@ -13,91 +15,71 @@ function [h, this] = xfigure(varargin)
 % Press "SHIFT+S" snap the view to the view-box
 % Press "SHIFT+P" to save the current window position
 %
-% Version 1.4, created by Mirza Cenanovic
+% Version 1.6, created by Mirza Cenanovic
+%
+% Changelog:
+% Version 1.5 - Uses input parser.
+% Version 1.6 - InfoText added
 
 %% Initiate
 % global xfigure_This
 
-xfigure_This.blankWindow = 0;
-figureIDIsProvided = 0;
-if nargin >= 1
-    param1 = varargin{1};
-    if isa(param1,'char')
-        fighand = strToHandleID(param1);
-        figureIDIsProvided = 1;
-        if ishandle(fighand)
-            figure(fighand)
-            h = fighand; this = h;
-            return
-        end
-    elseif isa(param1,'numeric')
-        fighand = param1;
-        if ishandle(fighand)
-            figure(fighand)
-            h = fighand; this = h;
-            return
-        end
-    end
-    
-    if nargin > 1
-        varargin = varargin(2:end);
-    end
-    
-    if isenabled('clf',varargin)
-       tryclose(fighand) 
-    end
-    
-    xfigure_This.gui = figure(fighand);
-    h = xfigure_This.gui;
-else
-    xfigure_This.gui = figure;
-    xfigure_This.blankWindow = 1;
-    h = xfigure_This.gui;
-end
+H.blankWindow = 0;
 
+p = inputParser;
+addOptional(p,'fignum',0,@isnumeric);
+addParameter(p,'Tag','')
+addParameter(p,'Title','')
+addParameter(p,'InfoText','')
+parse(p,varargin{:});
+PR = p.Results;
+
+if PR.fignum == 0
+    H.gui = figure;
+    H.blankWindow = 1;
+    h = H.gui;
+else
+    H.gui = figure(PR.fignum);
+    h = H.gui;
+end
+H.gui.Color = 'w';
 
 %% Figure properties
-xfigure_This.bcolor = get(xfigure_This.gui,'Color');
-if figureIDIsProvided > 0
+H.bcolor = get(H.gui,'Color');
+
+if strcmpi(PR.Tag, '')
     if verLessThan('matlab','8.4')
-        set(xfigure_This.gui,'Tag',param1)
+        set(H.gui,'Tag',num2str(h))
     else
-        xfigure_This.gui.Tag = param1;
+        H.gui.Tag = num2str(h.Number);
     end
 else
     if verLessThan('matlab','8.4')
-        set(xfigure_This.gui,'Tag',num2str(h))
+        set(H.gui,'Tag',PR.Tag)
     else
-        xfigure_This.gui.Tag = num2str(h.Number);
+        H.gui.Tag = PR.Tag;
     end
 end
-set(xfigure_This.gui,'ToolBar','figure')
-if isenabled('Title', varargin)
-    set(xfigure_This.gui, 'Name', getoption('Title', varargin))
-elseif figureIDIsProvided > 0
-    set(xfigure_This.gui, 'Name', param1)
+set(H.gui,'ToolBar','figure')
+
+if ~strcmpi(PR.Tag, '')
+    set(H.gui, 'Name', PR.Tag)
 end
-
-
-
-
-
-
 
 %% Axes
-xfigure_This.axes = axes;
-xfigure_This.axis = axis;
+H.axes = axes;
+H.axis = axis;
 
 %% Figure position, view, axis position and camerazoom
-xfigure_This.filename = ['XFig',get(xfigure_This.gui,'Tag'),'Data.mat'];
-if exist(xfigure_This.filename,'file') == 2
-    S = load(xfigure_This.filename);
+H.filename = ['XFig',get(H.gui,'Tag'),'Data.mat'];
+if exist(H.filename,'file') == 2
+    S = load(H.filename);
     if isfield(S,'WindowPosition')
-        set(xfigure_This.gui, 'Position', S.WindowPosition)
+        set(H.gui, 'Position', S.WindowPosition)
     end
     if isfield(S,'View')
-       xfigure_This.view = S.View;
-       view(xfigure_This.view(1),xfigure_This.view(2))
+       H.view = S.View;
+       view(H.view(1),H.view(2))
     end
     if isfield(S,'CameraZoom')
         set(gca,'CameraViewAngle',S.CameraZoom)
@@ -106,54 +88,60 @@ if exist(xfigure_This.filename,'file') == 2
     
     
 end
-xfigure_This.WindowPosition = get(xfigure_This.gui, 'Position');
+H.WindowPosition = get(H.gui, 'Position');
 
 %% View
-if isfield(xfigure_This,'view')
-    view(xfigure_This.view(1),xfigure_This.view(2))
+if isfield(H,'view')
+    view(H.view(1),H.view(2))
 end
 
 
 %% Help text
-xfigure_This.helpText = {'Press "G" to toggle grid'...
+H.helpText = {'Press "G" to toggle grid'...
     'Press "CTRL+R" to reset axis'...
     'Press "Middlemousebuton and drag" to pan axis'...
     'Press "CTRL+Click and drag" to rotate axis'...
     'Press "SHIFT+S" snap the view to the view-box'...
     'Press "SHIFT+P" to save the current window position'};
-xfigure_This.uiTextHelp = uicontrol('style','text','string',xfigure_This.helpText,'HorizontalAlignment','Left',...
+H.uiTextHelp = uicontrol('style','text','string',H.helpText,'HorizontalAlignment','Left',...
     'Position', [5,5,500,64],'Visible','off','BackgroundColor','w');
-ext1 = get(xfigure_This.uiTextHelp,'Extent');
-set(xfigure_This.uiTextHelp,'Position',[5,20,ext1(3),ext1(4)])
+ext1 = get(H.uiTextHelp,'Extent');
+set(H.uiTextHelp,'Position',[5,20,ext1(3),ext1(4)])
 
 %% Status text
-xfigure_This.statusText = ' ';
+H.statusText = ' ';
 % xfigure_This.uistatusText = uicontrol('style','text','string',xfigure_This.statusText,'HorizontalAlignment','Left',...
 %     'Position', [7,5,20,20],'Visible','on');
-xfigure_This.StatusBox = annotation('textbox', 'string', xfigure_This.statusText,'HorizontalAlignment','Left',...
+H.StatusBox = annotation('textbox', 'string', H.statusText,'HorizontalAlignment','Left',...
     'Units','pixels','Position', [7,5,20,20],'LineStyle','none','Visible','on');
 % set(xfigure_This.uistatusText,'BackgroundColor','w')
-xfigure_This.statusTextWidth = xfigure_This.WindowPosition(3)-2*5;
-xfigure_This.statusTextHeight = 15;
-set(xfigure_This.StatusBox,'Position',[5, 5, xfigure_This.statusTextWidth, xfigure_This.statusTextHeight])
+H.statusTextWidth = H.WindowPosition(3)-2*5;
+H.statusTextHeight = 15;
+set(H.StatusBox,'Position',[5, 5, H.statusTextWidth, H.statusTextHeight])
 
-
+%% InfoText
+H.InfoText = annotation('textbox', 'string', '','HorizontalAlignment','Left',...
+    'Units','normalized','Position', [0.1, 0.2, 0.1, 0.1], 'LineStyle','-','Visible','off',...
+    'BackgroundColor','w','FontName','Times', 'Interpreter', 'latex', 'FitBoxToText', 'on');
+if ~strcmpi(PR.InfoText, '')
+    set(H.InfoText,'String', PR.InfoText, 'Visible','on');  
+end
 %% Axis properties
-set(xfigure_This.axes, 'Units', 'pixels');
-set(xfigure_This.axes, 'TickDir','out');
+set(H.axes, 'Units', 'pixels');
+set(H.axes, 'TickDir','out');
 % set(xfigure_This.axes,'XColor', xfigure_This.bcolor,'YColor', xfigure_This.bcolor,'ZColor', xfigure_This.bcolor)
 
-xfigure_This.axesMarginSides = 60; %pixels
-xfigure_This.axesMarginTop = 40;
-xfigure_This.axesMarginBottom = xfigure_This.statusTextHeight + xfigure_This.axesMarginSides;
+H.axesMarginSides = 60; %pixels
+H.axesMarginTop = 40;
+H.axesMarginBottom = H.statusTextHeight + H.axesMarginSides;
 
-xfigure_This.axesWidth = xfigure_This.WindowPosition(3)-xfigure_This.axesMarginSides*2;
-xfigure_This.axesHeight = xfigure_This.WindowPosition(4) - xfigure_This.axesMarginBottom - xfigure_This.axesMarginTop;
+H.axesWidth = H.WindowPosition(3)-H.axesMarginSides*2;
+H.axesHeight = H.WindowPosition(4) - H.axesMarginBottom - H.axesMarginTop;
 
-set(xfigure_This.axes,'Position', [xfigure_This.axesMarginSides, xfigure_This.axesMarginBottom, xfigure_This.axesWidth,xfigure_This.axesHeight])
+set(H.axes,'Position', [H.axesMarginSides, H.axesMarginBottom, H.axesWidth,H.axesHeight])
 
-if exist(xfigure_This.filename,'file') == 2
-    S = load(xfigure_This.filename);
+if exist(H.filename,'file') == 2
+    S = load(H.filename);
     if isfield(S,'AxisPosition')
         set(gca,'Position',S.AxisPosition)
     end
@@ -166,38 +154,38 @@ end
 
 %
 %% Properties
-xfigure_This.rotate3d = 0;
-xfigure_This.hrot = 0;
-xfigure_This.grid = 0;
-xfigure_This.CameraViewAngleDefault = get(xfigure_This.axes,'CameraViewAngle');
-xfigure_This.CameraViewAngle = xfigure_This.CameraViewAngleDefault;
-xfigure_This.ZoomLevel = xfigure_This.CameraViewAngleDefault;
-xfigure_This.CameraDefaultPosition = get(xfigure_This.axes,'CameraPosition');
-xfigure_This.CameraTarget = get(xfigure_This.axes,'CameraTarget');
+H.rotate3d = 0;
+H.hrot = 0;
+H.grid = 0;
+H.CameraViewAngleDefault = get(H.axes,'CameraViewAngle');
+H.CameraViewAngle = H.CameraViewAngleDefault;
+H.ZoomLevel = H.CameraViewAngleDefault;
+H.CameraDefaultPosition = get(H.axes,'CameraPosition');
+H.CameraTarget = get(H.axes,'CameraTarget');
 
 
 %% Original figure state
-xfigure_This.axO = xfigure_This.axis;
-[xfigure_This.azO,xfigure_This.elO] = view;
-xfigure_This.axesPosO = get(xfigure_This.axes,'Position');
+H.axO = H.axis;
+[H.azO,H.elO] = view;
+H.axesPosO = get(H.axes,'Position');
 
 try
-    xfigure_This.PanStart = get(gca,'Position');
-    xfigure_This.PanStartX = xfigure_This.PanStart(1);
-    xfigure_This.PanStartY = xfigure_This.PanStart(2);
+    H.PanStart = get(gca,'Position');
+    H.PanStartX = H.PanStart(1);
+    H.PanStartY = H.PanStart(2);
 catch
-    xfigure_This.PanStartX = 0;
-    xfigure_This.PanStartY = 0;
+    H.PanStartX = 0;
+    H.PanStartY = 0;
 end
 
 %% Listeners
-set(xfigure_This.gui, 'KeyPressFcn',{@xfigure_KPF,xfigure_This})
-set(xfigure_This.gui, 'WindowScrollWheelFcn',@ScrollFcn)
-set(xfigure_This.gui, 'WindowButtonDownFcn',@buttonDownFcn)
-set(xfigure_This.gui, 'WindowButtonUpFcn',@buttonUpFcn)
-set(xfigure_This.gui, 'ResizeFcn', @ResizeFcn)
+set(H.gui, 'KeyPressFcn',{@xfigure_KPF,H})
+set(H.gui, 'WindowScrollWheelFcn',@ScrollFcn)
+set(H.gui, 'WindowButtonDownFcn',@buttonDownFcn)
+set(H.gui, 'WindowButtonUpFcn',@buttonUpFcn)
+set(H.gui, 'ResizeFcn', @ResizeFcn)
 % set(xfigure_This.gui, 'CloseRequestFcn',@mainCloseReq)
-this = xfigure_This;
+
     
 %% CallBackFunctions
     
@@ -216,7 +204,7 @@ this = xfigure_This;
         %% Middlemouse
         if strcmpi(selection,'extend')
             
-            xfigure_This.panSensitivity = 1;
+            H.panSensitivity = 1;
             
             set(gcf,'Pointer','fleur')
             set(gcf,'WindowButtonMotionFcn', @PanWindowButtonFcn)
@@ -225,26 +213,26 @@ this = xfigure_This;
             x = crd(1);
             y = crd(2);
             
-            xfigure_This.xstartPos = x;
-            xfigure_This.ystartPos = y;
+            H.xstartPos = x;
+            H.ystartPos = y;
         end
         
         %% CTRL + Middlemouse = rotate
         if (strcmpi(selection,'alt') || strcmpi(selection,'open')) && strcmp(modifier,'control')
-            xfigure_This.rotateSensitivity = 0.5;
+            H.rotateSensitivity = 0.5;
             
-            set(xfigure_This.gui,'Pointer','circle')
-            set(xfigure_This.gui,'WindowButtonMotionFcn', @RotateWindowButtonFcn)
+            set(H.gui,'Pointer','circle')
+            set(H.gui,'WindowButtonMotionFcn', @RotateWindowButtonFcn)
             
-            crd = get(xfigure_This.gui, 'CurrentPoint');
+            crd = get(H.gui, 'CurrentPoint');
             
             x = crd(1);
             y = crd(2);
-            xfigure_This.xs = x;
-            xfigure_This.ys = y;
-            [xfigure_This.az,xfigure_This.el] = view;
+            H.xs = x;
+            H.ys = y;
+            [H.az,H.el] = view;
             try
-                set(xfigure_This.StatusBox, 'String', ['Az: ',num2str(xfigure_This.az), ' El: ', num2str(xfigure_This.el) ])
+                set(H.StatusBox, 'String', ['Az: ',num2str(H.az), ' El: ', num2str(H.el) ])
             catch
 %                 disp(['Az: ',num2str(xfigure_This.az), ' El: ', num2str(xfigure_This.el) ])
             end
@@ -252,10 +240,10 @@ this = xfigure_This;
     end
 
     function buttonUpFcn(varargin)
-        set(xfigure_This.gui,'WindowButtonMotionFcn','');
-        set(xfigure_This.gui,'Pointer','arrow')
+        set(H.gui,'WindowButtonMotionFcn','');
+        set(H.gui,'Pointer','arrow')
         try
-            set(xfigure_This.StatusBox, 'String', [' '])
+            set(H.StatusBox, 'String', [' '])
         end
         
     end
@@ -267,15 +255,15 @@ this = xfigure_This;
         crd = get(gcf, 'CurrentPoint');
         x = crd(1);
         y = crd(2);
-        dx = -(xfigure_This.xstartPos - x);
-        dy = -(xfigure_This.ystartPos - y);
-        xfigure_This.xstartPos = x;
-        xfigure_This.ystartPos = y;
+        dx = -(H.xstartPos - x);
+        dy = -(H.ystartPos - y);
+        H.xstartPos = x;
+        H.ystartPos = y;
         
         
         Pos = get(gca,'Position');
         
-        Pos = Pos + xfigure_This.panSensitivity * [dx,dy,0,0];
+        Pos = Pos + H.panSensitivity * [dx,dy,0,0];
         
         set(gca,'Position', Pos)
         %% New
@@ -292,13 +280,13 @@ this = xfigure_This;
     end
 
     function RotateWindowButtonFcn(varargin)        
-        crd = get(xfigure_This.gui, 'CurrentPoint');
+        crd = get(H.gui, 'CurrentPoint');
         x = crd(1);
         y = crd(2);
-        dx = (xfigure_This.xs - x);
-        dy = (xfigure_This.ys - y);
-        xfigure_This.xs = x;
-        xfigure_This.ys = y;
+        dx = (H.xs - x);
+        dy = (H.ys - y);
+        H.xs = x;
+        H.ys = y;
         
 %         daz = sign(dx);
 %         del = sign(dy);
@@ -307,25 +295,25 @@ this = xfigure_This;
         del = dy;
 
         %         [daz,del]*xfigure_This.rotateSensitivity;
-        xfigure_This.az = xfigure_This.az + round(daz * xfigure_This.rotateSensitivity);
-        xfigure_This.el = xfigure_This.el + round(del * xfigure_This.rotateSensitivity);
+        H.az = H.az + round(daz * H.rotateSensitivity);
+        H.el = H.el + round(del * H.rotateSensitivity);
         
-        view(xfigure_This.az,xfigure_This.el)
+        view(H.az,H.el)
         
-        if xfigure_This.az > 360
-            xfigure_This.az = xfigure_This.az - 360;
+        if H.az > 360
+            H.az = H.az - 360;
         end
-        if xfigure_This.az < -360
-            xfigure_This.az = xfigure_This.az + 360;
+        if H.az < -360
+            H.az = H.az + 360;
         end
-        if xfigure_This.el > 360
-            xfigure_This.el = xfigure_This.el - 360;
+        if H.el > 360
+            H.el = H.el - 360;
         end
-        if xfigure_This.el < -360
-            xfigure_This.el = xfigure_This.el + 360;
+        if H.el < -360
+            H.el = H.el + 360;
         end
         try
-            set(xfigure_This.StatusBox, 'String', ['Az: ',num2str(xfigure_This.az), ' El: ', num2str(xfigure_This.el) ])
+            set(H.StatusBox, 'String', ['Az: ',num2str(H.az), ' El: ', num2str(H.el) ])
         catch
 %             disp(['Az: ',num2str(xfigure_This.az), ' El: ', num2str(xfigure_This.el) ])
         end
@@ -335,7 +323,7 @@ this = xfigure_This;
     function ScrollFcn(varargin)
         %% Zoom factor:        
         controlIsPressed = 0;
-        modifier = get(xfigure_This.gui,'currentModifier');
+        modifier = get(H.gui,'currentModifier');
         if ~isempty(modifier)
             switch modifier{1}
                 case 'control'
@@ -354,62 +342,18 @@ this = xfigure_This;
     end
 
     function ResizeFcn(varargin)
-        xfigure_This.WindowPosition = get(xfigure_This.gui,'Position');
-        xfigure_This.statusTextWidth = xfigure_This.WindowPosition(3)-2*5;
+        H.WindowPosition = get(H.gui,'Position');
+        H.statusTextWidth = H.WindowPosition(3)-2*5;
         try
-            set(xfigure_This.StatusBox,'Position',[5, 5, xfigure_This.statusTextWidth, xfigure_This.statusTextHeight])
+            set(H.StatusBox,'Position',[5, 5, H.statusTextWidth, H.statusTextHeight])
         end
-        xfigure_This.axesWidth = xfigure_This.WindowPosition(3)-xfigure_This.axesMarginSides*2;
-        xfigure_This.axesHeight = xfigure_This.WindowPosition(4) - xfigure_This.axesMarginBottom - xfigure_This.axesMarginTop;
+        H.axesWidth = H.WindowPosition(3)-H.axesMarginSides*2;
+        H.axesHeight = H.WindowPosition(4) - H.axesMarginBottom - H.axesMarginTop;
         try
-            set(xfigure_This.axes,'Position', [xfigure_This.axesMarginSides, xfigure_This.axesMarginBottom, xfigure_This.axesWidth,xfigure_This.axesHeight])
+            set(H.axes,'Position', [H.axesMarginSides, H.axesMarginBottom, H.axesWidth,H.axesHeight])
         end
     end
 
 
-end
-
-% function KeyPressFcn(source,event,xfigure_This)
-% xfigure_KPF(source, event, xfigure_This);
-% 
-% end
-
-function rv = isenabled(mode, varargin)
-if nargin < 1
-    error('No arguments')
-end
-varargin = varargin{:};
-
-ind = find(strcmpi(varargin,mode), 1);
-if ~isempty(ind)
-    rv = 1;
-else
-    rv = 0;
-end
-end
-function param = getoption(mode, varargin)
-varargin = varargin{:};
-ind1 = find(strcmpi(varargin,mode), 1);
-if ~isempty(ind1)
-    %Errorhandling
-    if ~iscell(varargin)
-        varargin = {varargin};
-    end
-    if ind1+1 <= length(varargin)
-        param = varargin{ind1+1};
-    else
-        %         error(['No options are followed by the property ''', mode,''' '])
-        param = [];
-    end
-else
-    param = [];
-end
-end
-
-function h = strToHandleID(str)
-h = round(norm(double(str)-44,1));
-if h > intmax-1
-    error('h is exceeding intmax!')
-end
 end
 
