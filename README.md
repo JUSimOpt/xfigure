@@ -5,9 +5,9 @@ Extended figure with additional interactive mouse controls.
 
 
 ### News:
-- 1.4 Added GKPF. Graphical Key Press Function. Ammends the default keypress with user defined keys. Use GKPF to add own hotkeys. Keep GKPF.m inside your project files.
-- 1.5 Cleaned up input parsing using inputParser. Minor changes to input.
 - 1.6 InfoText added. Simplifies adding textbox using cell array of strings. H.InfoText holds the handle.
+- 1.5 Cleaned up input parsing using inputParser. Minor changes to input.
+- 1.4 Added GKPF. Graphical Key Press Function. Ammends the default keypress with user defined keys. Use GKPF to add own hotkeys. Keep GKPF.m inside your project files.
 
 ## Features
 **Mouse features**
