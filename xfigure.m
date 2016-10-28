@@ -1,12 +1,18 @@
-function [h, H] = xfigure(varargin)
+function varargout = xfigure(varargin)
+%XFIGURE Extended figure function
+%
 % xfigure
+% xfigure(fignumber)
+% xfigure(fignumber, 'PropertyName',propertyvalue,...)
 % [h, H] = xfigure()
-% [h, H] = xfigure(fignumber, param)
+% [h, H] = xfigure(...)
 %
 % Optional Parameter:
-% Tag
-% Title
-% InfoText    - TextBox with specified text.
+% PropertyName | Default | Description  
+% -------------|---------|--------------
+% Tag          | ''      |
+% Title        | ''      |
+% InfoText     | ''      | TextBox with specified text.
 %
 % Press "G" to toggle grid
 % Press "CTRL+R" to reset axis
@@ -61,14 +67,16 @@ else
     end
 end
 set(H.gui,'ToolBar','figure')
-
-if ~strcmpi(PR.Tag, '')
-    set(H.gui, 'Name', PR.Tag)
-end
+H.gui.Name = PR.Title;
+% if ~strcmpi(PR.Tag, '')
+%     set(H.gui, 'Name', PR.Tag)
+% end
 
 %% Axes
 if ~ishold
     cla
+    H.axes = gca;
+else
     H.axes = gca;
 end
 H.axis = axis;
@@ -189,10 +197,12 @@ set(H.gui, 'WindowButtonUpFcn',@buttonUpFcn)
 set(H.gui, 'ResizeFcn', @ResizeFcn)
 % set(xfigure_This.gui, 'CloseRequestFcn',@mainCloseReq)
 
-    
-%% CallBackFunctions
-    
-
+%% Output
+varargout{1} = h;
+varargout{2} = h;
+if nargout == 0
+    varargout = {};
+end
 
 
 %% CallBackFunctions
