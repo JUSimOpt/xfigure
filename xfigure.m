@@ -67,7 +67,10 @@ if ~strcmpi(PR.Tag, '')
 end
 
 %% Axes
-H.axes = axes;
+if ~ishold
+    cla
+    H.axes = gca;
+end
 H.axis = axis;
 
 %% Figure position, view, axis position and camerazoom
