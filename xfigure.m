@@ -199,7 +199,7 @@ set(H.gui, 'ResizeFcn', @ResizeFcn)
 
 %% Output
 varargout{1} = h;
-varargout{2} = h;
+varargout{2} = H;
 if nargout == 0
     varargout = {};
 end
