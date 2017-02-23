@@ -122,25 +122,42 @@ end
 %%
 if strcmpi(event.Key,'numpad4')
     [az,el] = view();
-    az = az+5;
+    if ~isempty(find(strcmp(modifier,'control'),1))
+        az = az+0.1;
+    else
+        az = az+5;
+    end
+    
     view(az,el)
     set(xfigure_This.StatusBox, 'String', ['Az: ',num2str(az), ' El: ', num2str(el) ])
 end
 if strcmpi(event.Key,'numpad6')
     [az,el] = view();
-    az = az-5;
+    if ~isempty(find(strcmp(modifier,'control'),1))
+        az = az-0.1;
+    else
+        az = az-5;
+    end
     view(az,el)
     set(xfigure_This.StatusBox, 'String', ['Az: ',num2str(az), ' El: ', num2str(el) ])
 end
 if strcmpi(event.Key,'numpad8')
     [az,el] = view();
-    el = el-5;
+    if ~isempty(find(strcmp(modifier,'control'),1))
+        el = el-0.1;
+    else
+        el = el-5;
+    end
     view(az,el)
     set(xfigure_This.StatusBox, 'String', ['Az: ',num2str(az), ' El: ', num2str(el) ])
 end
 if strcmpi(event.Key,'numpad2')
     [az,el] = view();
-    el = el+5;
+    if ~isempty(find(strcmp(modifier,'control'),1))
+        el = el+0.1;
+    else
+        el = el+5;
+    end
     view(az,el)
     set(xfigure_This.StatusBox, 'String', ['Az: ',num2str(az), ' El: ', num2str(el) ])
 end
