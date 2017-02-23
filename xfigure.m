@@ -253,6 +253,9 @@ end
     end
 
     function buttonUpFcn(varargin)
+        if ~exist('H','var') || ~isfield(H,'gui')
+            H.gui = gcf;
+        end
         set(H.gui,'WindowButtonMotionFcn','');
         set(H.gui,'Pointer','arrow')
         try
@@ -355,14 +358,24 @@ end
     end
 
     function ResizeFcn(varargin)
+        if ~exist('H','var') || ~isfield(H,'gui')
+            H.gui = gcf;
+            H.axes = gca;
+            H.axesMarginSides = 60; %pixels
+            H.axesMarginTop = 40;
+            
+        end
         H.WindowPosition = get(H.gui,'Position');
         H.statusTextWidth = H.WindowPosition(3)-2*5;
+       
         try
             set(H.StatusBox,'Position',[5, 5, H.statusTextWidth, H.statusTextHeight])
         end
-        H.axesWidth = H.WindowPosition(3)-H.axesMarginSides*2;
-        H.axesHeight = H.WindowPosition(4) - H.axesMarginBottom - H.axesMarginTop;
+        
         try
+            H.axesMarginBottom = H.statusTextHeight + H.axesMarginSides;
+            H.axesWidth = H.WindowPosition(3)-H.axesMarginSides*2;
+            H.axesHeight = H.WindowPosition(4) - H.axesMarginBottom - H.axesMarginTop;
             set(H.axes,'Position', [H.axesMarginSides, H.axesMarginBottom, H.axesWidth,H.axesHeight])
         end
     end
